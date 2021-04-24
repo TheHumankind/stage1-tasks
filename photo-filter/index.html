@@ -15,7 +15,7 @@
     <h1 class="header-title">Photo-filter</h1>
   </header>
   <main class="main">
-    <div class="filters">
+    <form id="myForm" class="filters">
       <label>
         Blur:
         <input name="blur" data-sizing="px" type="range" min="0" max="10" value="0" />
@@ -38,13 +38,13 @@
       </label>
       <label>
         Hue rotate:
-        <input name="hue" data-sizing="deg" type="range" min="0" max="360" value="0" />
+        <input name="hue-rotate" data-sizing="deg" type="range" min="0" max="360" value="0" />
         <output name="result">0</output>
       </label>
-    </div>
+    </form>
     <div class="editor">
       <div class="btn-container">
-        <button class="btn btn-reset">Reset</button>
+        <button id="btnReset" class="btn btn-reset">Reset</button>
         <button class="btn btn-next btn-active">Next picture</button>
         <label class="btn btn-load" for="btnInput">
           Load picture
@@ -52,7 +52,8 @@
         </label>
         <button class="btn btn-save">Save picture</button>
       </div>
-      <img src="assets/img/img.jpg" alt="image" />
+        <canvas></canvas>
+        <img id="editorImage" src="assets/img/img.jpg" alt="image" />
     </div>
   </main>
   <footer class="footer">
@@ -64,5 +65,6 @@
     </div>
   </footer>
   <button class="fullscreen openfullscreen"></button>
+  <script src="script.js"></script>
 </body>
 </html>
