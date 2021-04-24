@@ -1,18 +1,33 @@
-const inputs = document.querySelectorAll("input[type=range]"),
+const inputs    = document.querySelectorAll("input[type=range]"),
       selectBtn = document.getElementById("btnInput"),
-      resetBtn = document.getElementById("btnReset"),
-      saveBtn = document.querySelector(".btn-save"),
-      canvas = document.querySelector("canvas"),
-      newImg = document.getElementById('editorImage');
+      resetBtn  = document.getElementById("btnReset"),
+      saveBtn   = document.querySelector(".btn-save"),
+      canvas    = document.querySelector("canvas"),
+      newImg    = document.getElementById('editorImage'),
+      nextBtn   = document.getElementById('btnNext'),
+      fullScr = document.querySelector('.fullscreen'),
+      now       = new Date();
+      
+let   nowIs     =  '',
+      currentImg = `01`;
 
-console.log(inputs);
+
+// get time 
+  if (now.getHours() >= 6 && now.getHours() < 12) { nowIs = 'morning';  }
+  if (now.getHours() >= 12 && now.getHours() < 18) { nowIs = 'day';  }
+  if (now.getHours() >= 18 && now.getHours() < 24) { nowIs = 'evening';  }
+  if (now.getHours() >= 0 && now.getHours() < 6) { nowIs = 'night';  }
+
+// get inputs and image 
 
 let selectedFile = document.getElementById("btnInput").files[0],
-    newImgSrc = new Image();
+    newImgSrc    = new Image();
 const img = new Image(),
       ctx = canvas.getContext("2d");
-      img.setAttribute('crossOrigin', 'anonymous'); 
-      img.src = "assets/img/img.jpg";
+      
+img.setAttribute('crossOrigin', 'anonymous'); 
+img.src = `assets/img/${nowIs}/${currentImg}.jpg`;
+newImg.src = `assets/img/${nowIs}/${currentImg}.jpg`;
 
 // upload image to service
 
@@ -23,6 +38,7 @@ function loadUs(e) {
     newImg.src = reader.result;
     img.src = reader.result;
   }
+  e.target.value = '';
   reader.readAsDataURL(file);
 }
 
@@ -34,7 +50,6 @@ function drawImage() {
   img.onload = function() {
     canvas.width = img.width;
     canvas.height = img.height;
-    ctx.filter = "blur(0)";
     ctx.drawImage(img, 0, 0);
   };  
 }
@@ -51,6 +66,10 @@ function saveUs(e) {
 }
 
 saveBtn.addEventListener('click',e => saveUs(e));
+saveBtn.addEventListener('mouseover', () => {
+  ctx.filter = `blur(${blurVal}px) invert(${invertVal}%) sepia(${sepiaVal}%) saturate(${saturateVal}%) hue-rotate(${hueVal}deg)`;
+  ctx.drawImage(img, 0, 0);
+});
 
 // inputs update value
 
@@ -71,12 +90,12 @@ function handleUpdate() {
   else if (this.name === 'hue-rotate') { hueVal = this.value * 1; }
   else if (this.name === 'invert') { invertVal = this.value; }
   ctx.filter = `blur(${blurVal}px) invert(${invertVal}%) sepia(${sepiaVal}%) saturate(${saturateVal}%) hue-rotate(${hueVal}deg)`;
-  ctx.drawImage(img, 1, 1);
+  ctx.drawImage(img, 0, 0);
 }
 
 inputs.forEach(input => input.addEventListener('mousemove', handleUpdate));
 inputs.forEach(input => input.addEventListener('change', handleUpdate));
-inputs.forEach(input => input.addEventListener('mousedown', handleUpdate));
+
 //reset this shit 
 
 function resetUs(e) {
@@ -94,10 +113,55 @@ function resetUs(e) {
   saturateVal = 83,
   hueVal = 0,
   invertVal = 0;
-  ctx.drawImage(img, 1, 1);  
+  ctx.drawImage(img, 0, 0);  
   document.getElementById("myForm").reset();
 }
 
 resetBtn.addEventListener('click', e => resetUs(e));
+
+// switch image (next btn)
+
+let nextImg = Number(currentImg);
+
+function next(e) {
+
+  nextImg++;
+  if (nextImg === 21) { nextImg = 1; }
+  if (nextImg <= 9) { nextImg = `0` + nextImg; }
+  img.src = `assets/img/${nowIs}/${nextImg}.jpg`;
+  newImg.src = `assets/img/${nowIs}/${nextImg}.jpg`;
+}
+
+console.log(nowIs);
+nextBtn.addEventListener('click',e => next(e));
+
+// fullscreen
+
+function activateFullscreen(element) {
+  if(element.requestFullscreen) {
+    element.requestFullscreen();        
+  }
+  else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();    
+  }
+};
+
+function deactivateFullscreen() {
+  if(document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+};
+
+fullScr.addEventListener('click', e =>{
+  activateFullscreen(document.querySelector('html'));
+});
+fullScr.addEventListener('click', e =>{
+  deactivateFullscreen(document.querySelector('html'));
+});
+
 
 drawImage();
